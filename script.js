@@ -8,6 +8,14 @@ const cols = canvas.width / grid;
 let score = 0;
 const scoreElement = document.getElementById('score');
 
+let highScore = 0;
+const highScoreElement = document.createElement('p');
+highScoreElement.textContent = `High Score: ${highScore}`;
+highScoreElement.style.color = '#fff';
+highScoreElement.style.fontSize = '1.5rem';
+highScoreElement.style.textAlign = 'center';
+document.querySelector('.score-container').appendChild(highScoreElement);
+
 const colors = [
     '#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33F3', '#33FFF3', '#F333FF'
 ];
@@ -52,6 +60,29 @@ function drawMatrix(matrix, offset) {
 function updateScore() {
     score += 10;
     scoreElement.textContent = score;
+}
+
+function updateHighScore() {
+    if (score > highScore) {
+        highScore = score;
+        highScoreElement.textContent = `High Score: ${highScore}`;
+    }
+}
+
+function checkGameOver() {
+    if (arena[0].some(cell => cell !== 0)) {
+        alert('Game Over!');
+        resetGame();
+    }
+}
+
+function resetGame() {
+    arena.forEach(row => row.fill(0));
+    score = 0;
+    scoreElement.textContent = score;
+    piece = createPiece();
+    position = { x: 3, y: 0 };
+    dropInterval = 1000;
 }
 
 function createPiece() {
@@ -106,6 +137,8 @@ function dropPiece() {
     if (collide()) {
         position.y--;
         merge();
+        updateHighScore();
+        checkGameOver();
         piece = createPiece();
         position = { x: 3, y: 0 };
         updateScore();
